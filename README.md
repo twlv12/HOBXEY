@@ -1,5 +1,5 @@
-# ![HOBXEY](https://user-images.githubusercontent.com/79507121/212981329-03b0b4af-2715-438c-8ed3-827425841a97.png)
-HOBXEY (Hybrid Organism Behavior Evolution Simulator)
+![HOBXEY](https://user-images.githubusercontent.com/79507121/212982079-f6b68cf5-3565-4e88-b70d-0c229eadcd36.png)
+# HOBXEY (Hybrid Organism Behavior Evolution Simulator)
 
 The program simulates creatures that move and interact with their environment using a genetic algorithm to evolve their behavior over time. The creatures' behavior is controlled by a set of genes that make up their genome. These genes determine the connections and weights between the creature's neurons, which in turn control its behavior.
 
