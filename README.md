@@ -1,5 +1,12 @@
-![HOBXEY](https://user-images.githubusercontent.com/79507121/212982079-f6b68cf5-3565-4e88-b70d-0c229eadcd36.png)
-# HOBXEY (Hybrid Organism Behavior eXperimentation sYstem.)
+<div align="center">
+<!-- Title: -->
+  <a href="https://github.com/uloa/">
+    <img src="https://user-images.githubusercontent.com/79507121/212982079-f6b68cf5-3565-4e88-b70d-0c229eadcd36.png" height="156">
+  </a>
+  <h1><a href="https://github.com/uloa/HOBXEY/">HOBXEY</a> - Python</h1>
+<!-- Short description: -->
+  <h3>Hybrid Organism Behavior eXperimentation sYstem</h3>
+</div>
 
 This program uses genetic algorithms to simulate the evolution of organisms in a virtual world. Creatures are controlled by a neural network defined by a genome, a string of binary digits. This program uses the pygame library to visualize the world.
 ## Requirements
