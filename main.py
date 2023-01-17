@@ -49,6 +49,7 @@ worldSize = (64, 64)          #World size in cells
 population = 200                #How many creatures
 windowSize = (512, 512)       #Window size
 stepsPerGeneration = 200        #How many steps in each generation
+mutationChance = 0.05           #Chance for a mutation to occur on each creature
 customGenomes = []              #Will be overwritten by save file
 quickMode = False               #About 3x faster, minimal console and display
 saveFile = 'usersave.pickle'    #File to save to
@@ -188,7 +189,8 @@ def selectCreatures(world):
         creature = world.creatures.pop()
         i += 1
         if creature.canReproduce:
-            if random.randint(0, 5) == 1:
+            x = int((1 / 20) * 100) - 1
+            if random.randint(0, x) == 1:
                 mutatedGenome = (mutate(creature.genome))
                 selected.append(mutatedGenome); mutations.append(mutatedGenome)
             else:
