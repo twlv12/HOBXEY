@@ -49,9 +49,10 @@ worldSize = (64, 64)          #World size in cells
 population = 200                #How many creatures
 windowSize = (512, 512)       #Window size
 stepsPerGeneration = 200        #How many steps in each generation
+mutationChance = 5           #Chance in percent for a mutation to occur on each creature
 customGenomes = []              #Will be overwritten by save file
 quickMode = False               #About 3x faster, minimal console and display
-saveFile = 'usersave.pickle'    #File to save to
+saveFile = ''    #File to save to
 loadFile = ''    #File to load from
 #--------Properties-----------#
 
@@ -188,7 +189,8 @@ def selectCreatures(world):
         creature = world.creatures.pop()
         i += 1
         if creature.canReproduce:
-            if random.randint(0, 5) == 1:
+            x = int((1 / mutationChance) * 100) - 1
+            if random.randint(0, x) == 1:
                 mutatedGenome = (mutate(creature.genome))
                 selected.append(mutatedGenome); mutations.append(mutatedGenome)
             else:
@@ -543,17 +545,15 @@ if quickMode: showDisplay = False
 #--------Loop-----------#
 def main():
     print("Initializing World...")
-    if usingLoadFile:
-        world = World(worldSize, population, loadCreatures())
-    elif usingCustomGenomes:
-        world = World(worldSize, population, customGenomes)
-    else:
-        world = World(worldSize, population)
+    if usingLoadFile: world = World(worldSize, population, loadCreatures())
+    elif usingCustomGenomes: world = World(worldSize, population, customGenomes)
+    else: world = World(worldSize, population)
     print("World Initialized.")
     print("------------------\nStarting Master Update Loop...\n")
     
     counter = 1; gen = 1; iq = "N/A"
     running = True
+    lastSave = 0
     while running:
         if counter > stepsPerGeneration:
             print(f"Gen: {gen}")
@@ -589,12 +589,19 @@ def main():
                         print(decodeGenome(genome)[2])
                         t.sleep(3)
                     if event.key == pygame.K_s:
-                        if len(saveFile) > 0:
-                            saveCreatures(world)
-                            print("Saved to file: " + saveFile)
+                        if lastSave is not gen:
+                            lastSave = gen
+                            if usingSaveFile:
+                                saveCreatures(world, saveFile)
+                                print("Saved to file: " + saveFile)
+                            else:
+                                current_time_struct = t.gmtime(t.time())
+                                time = t.strftime("%Y-%m-%d_%H-%M", current_time_struct)
+                                saveFile = f"usersave{time}.pickle"
+                                saveCreatures(world, saveFile)
+                                print("Saved to file: " + saveFile)
                         else:
-                            print("NO FILE.")
-                            t.sleep(1)
+                            print("Please wait before saving.")
 
         if not quickMode:
             if showDisplay: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Cell ({str(cell.x).zfill(3)},{str(cell.y).zfill(3)}) | Ph {str(round(cell.pheromone, 3)).zfill(4)} | {population}")
