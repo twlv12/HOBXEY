@@ -11,14 +11,16 @@ gc.enable()
 
 inputNeuronTypes = {
     "0001" : "RandomInput",
-    "0010" : "BlockageX",
-    "0011" : "BlockageY",
+    "0010" : "BlockageUp",
+    "0011" : "BlockageDown",
     "0100" : "XGradient",
     "0101" : "YGradient",
     "0110" : "ChangeX",
     "0111" : "ChangeY",
     "1000" : "Density",
-    "1001" : "Pheromone"
+    "1001" : "Pheromone",
+    "1010" : "BlockageLeft",
+    "1011" : "BlockageRight"
     }
 internalNeuronTypes = {
     "0001" : "ConstantPos",
@@ -40,15 +42,15 @@ neuronTypeIndicators = {
 
 
 #--------Properties-----------#
-genomeLength = 4
-worldSize = (64, 64)
-population = 200
-windowSize = (1280, 1280)
-stepsPerGeneration = 200
-customGenomes = [] #Will be overwritten by save file
-showDisplay = True
-saveFile = 'worldData.pickle'
-loadFile = ''
+genomeLength = 6                #How many genes in a genome
+worldSize = (128, 128)          #World size in cells
+population = 200                #How many creatures
+windowSize = (1280, 1280)       #Window size
+stepsPerGeneration = 200        #How many steps in each generation
+customGenomes = []              #Will be overwritten by save file
+quickMode = False               #About 3x faster, minimal console and display
+saveFile = 'usersave.pickle'    #File to save to
+loadFile = 'autosave.pickle'    #File to load from
 #--------Properties-----------#
 
 
@@ -57,7 +59,7 @@ loadFile = ''
 
 """ Within 10x10 square at the center of the world:
 
-if(x > (world.sizeX//2 - 10)) and (x < (world.sizeX//2 + 10)) and (y > (world.sizeY//2 - 10)) and (y < (world.sizeY//2 + 10))
+if(x > (world.sizeX//2 - 10)) and (x < (world.sizeX//2 + 10)) and (y > (world.sizeY//2 - 10)) and (y < (world.sizeY//2 + 10)):
     return 1
 else: return 0
 
@@ -73,9 +75,9 @@ else: return 1
         
 
 def isValid(x,y,world):
-    if 4 <= x <= world.sizeX-4 and 4 <= y <= world.sizeY-4:
-        return 0
-    else: return 1
+    if(x > (world.sizeX//2 - 10)) and (x < (world.sizeX//2 + 10)) and (y > (world.sizeY//2 - 10)) and (y < (world.sizeY//2 + 10)):
+        return 1
+    else: return 0
 
 
     
@@ -97,7 +99,7 @@ def mutate(genome):
 
 
 
-
+ 
 def decodeGenome(input):
     genomeLen = len(input)
     genes = []
@@ -118,7 +120,7 @@ def decodeGenome(input):
             target = neuronTypeIndicators[tt][tid]
             
             struct += f"       {source} -> {target} : {weight}\n"
-        except Exception as e:
+        except Exception:
             source = "Invalid"
             target = "Invalid"
             struct += f"       Invalid Gene: {gene}\n"
@@ -128,9 +130,9 @@ def decodeGenome(input):
 
 
 
-def saveCreatures(world):
+def saveCreatures(world, file):
     genomes_data = [creatures.genome for creatures in world.creatures]
-    with open(saveFile, "wb") as f:
+    with open(file, "wb") as f:
         pickle.dump(genomes_data, f)
 def loadCreatures():
     with open(loadFile, "rb") as f:
@@ -180,7 +182,7 @@ def selectCreatures(world):
         creature = world.creatures.pop()
         i += 1
         if creature.canReproduce:
-            if random.randint(0, 10) == 1:
+            if random.randint(0, 5) == 1:
                 mutatedGenome = (mutate(creature.genome))
                 selected.append(mutatedGenome); mutations.append(mutatedGenome)
             else:
@@ -236,19 +238,29 @@ class Neuron:
     def RandomInput(self, input):
         return random.random()
 
-    def BlockageX(self, input):
+    def BlockageUp(self, input):
         try:
-            if self.world.getCell(self.creature.x + 1, self.creature.y).creature: return 1
-            elif self.world.getCell(self.creature.x - 1, self.creature.y).creature: return -1
+            if self.creature.getCell(self.creature.x, self.creature.y+1).creature: return 1
             else: return 0
-        except: return 0
+        except: return 1
 
-    def BlockageY(self, input):
+    def BlockageDown(self,input):
         try:
-            if self.world.getCell(self.creature.x, self.creature.y + 1).creature: return 1
-            elif self.world.getCell(self.creature.x, self.creature.y - 1).creature: return -1
+            if self.creature.getCell(self.creature.x, self.creature.y-1).creature: return 1
             else: return 0
-        except: return 0
+        except: return 1
+
+    def BlockageLeft(self,input):
+        try:
+            if self.creature.getCell(self.creature.x-1, self.creature.y).creature: return 1
+            else: return 0
+        except: return 1
+
+    def BlockageRight(self,input):
+        try:
+            if self.creature.getCell(self.creature.x+1, self.creature.y).creature: return 1
+            else: return 0
+        except: return 1
 
     def XGradient(self, input):
         gradient = 2 * (self.creature.x / worldSize[0] - 0.5)
@@ -283,23 +295,23 @@ class Neuron:
         return -input
 
     def MoveX(self, input):
-        if input > 0:
+        if input >= 0.5:
             if self.creature.x + 1 < self.world.sizeX:
                 self.creature.moveToCell(self.world.getCell(self.creature.x + 1, self.creature.y))
-        elif input < 0:
+        elif input <= -0.5:
             if self.creature.x - 1 >= 0:
                 self.creature.moveToCell(self.world.getCell(self.creature.x - 1, self.creature.y))
         
     def MoveY(self, input):
-        if input > 0:
+        if input >= 0.5:
             if self.creature.y + 1 < self.world.sizeY:
                 self.creature.moveToCell(self.world.getCell(self.creature.x, self.creature.y + 1))
-        elif input < 0:
+        elif input <= -0.5:
             if self.creature.y - 1 >= 0:
                 self.creature.moveToCell(self.world.getCell(self.creature.x, self.creature.y - 1))
         
     def MoveRandom(self, input):
-        if input < 0 or input > 0:
+        if input <= -0.5 or input >= 0.5:
             cell = random.choice(self.creature.getAdjacentCells())
             self.creature.moveToCell(cell)
         
@@ -434,6 +446,11 @@ class Creature:
         g = random.randint(0, 255)
         b = random.randint(0, 255)
         return (r, g, b)
+
+    def kill(self):
+        self.cell.creature = None
+        self.world.freeCells.append(self.cell)
+        del self
     
     def toDict(self):
         return {"genome": self.genome, 
@@ -445,7 +462,7 @@ class Creature:
     
         
 class World:
-    def __init__(self, size, population):
+    def __init__(self, size, population, genomes = None):
         self.sizeX = size[0]
         self.sizeY = size[1]
         self.cells = []
@@ -453,11 +470,10 @@ class World:
         self.movements = 0
         self.cells = [[Cell(i,j) for j in range(self.sizeY)] for i in range(self.sizeX)]
         self.freeCells = [cell for row in self.cells for cell in row]
-         
-        self.initializePopulation(population, customGenomes)
+
         if showDisplay:
             self.initializeDisplay()
-        print("Population Initialized.")
+        self.initializePopulation(population, genomes)
                 
     def getCell(self, x, y):
        if x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY:
@@ -472,12 +488,12 @@ class World:
 
     def initializePopulation(self, population, genomes):
         self.population = population
-        if customGenomes == None or len(customGenomes) == 0:
+        if genomes == None:
             for i in range(self.population):
                 self.creatures.append(Creature(self))
         else:
             for i in range(self.population):
-                genome = random.choice(customGenomes)
+                genome = random.choice(genomes)
                 self.creatures.append(Creature(self, genome))
 
     def update(self):
@@ -502,22 +518,22 @@ class World:
 #--------Classes-----------#            
 
 
-usingLoadFile = False; usingSaveFile = False
-if len(customGenomes) == 0:
-    customGenomes = None
-if len(saveFile) > 0:
-    usingSaveFile = True
-if len(loadFile) > 0:
-    usingLoadFile = True
+usingLoadFile = False; usingSaveFile = False; showDisplay = True; usingCustomGenomes = False
+if len(customGenomes) > 0: usingCustomGenomes = True
+if len(saveFile) > 0: usingSaveFile = True
+if len(loadFile) > 0: usingLoadFile = True
+if quickMode: showDisplay = False
 
 
 #--------Loop-----------#
 def main():
-    if usingLoadFile:
-        global customGenomes
-        customGenomes = loadCreatures()
     print("Initializing World...")
-    world = World(worldSize, population)
+    if usingLoadFile:
+        world = World(worldSize, population, loadCreatures())
+    elif usingCustomGenomes:
+        world = World(worldSize, population, customGenomes)
+    else:
+        world = World(worldSize, population)
     print("World Initialized.")
     print("------------------\nStarting Master Update Loop...\n")
     
@@ -525,12 +541,16 @@ def main():
     running = True
     while running:
         if counter > stepsPerGeneration:
+            print(f"Gen: {gen}")
             counter = 1
             gen += 1
             iq = selectCreatures(world)
             for row in world.cells:
                 for cell in row:
                     cell.pheromone = 0
+            saveCreatures(world, "autosave.pickle")
+            print("Autosaved.")
+
         #if gen > 10 and iq < 0.5:
         #    main()
             
@@ -561,8 +581,9 @@ def main():
                             print("NO FILE.")
                             t.sleep(1)
 
-        if showDisplay: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Cell ({str(cell.x).zfill(3)},{str(cell.y).zfill(3)}) | Ph {str(round(cell.pheromone, 3)).zfill(4)} | {population}")
-        else: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Pop {population}")
+        if not quickMode:
+            if showDisplay: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Cell ({str(cell.x).zfill(3)},{str(cell.y).zfill(3)}) | Ph {str(round(cell.pheromone, 3)).zfill(4)} | {population}")
+            else: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Pop {population}")
         counter += 1
         gc.collect()
 #--------Loop-----------#
