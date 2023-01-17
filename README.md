@@ -1,0 +1,12 @@
+![HOBXEY](https://user-images.githubusercontent.com/79507121/212982079-f6b68cf5-3565-4e88-b70d-0c229eadcd36.png)
+# HOBXEY (Hybrid Organism Behavior eXperimentation sYstem.)
+
+The program simulates creatures that move and interact with their environment using a genetic algorithm to evolve their behavior over time. The creatures' behavior is controlled by a set of genes that make up their genome. These genes determine the connections and weights between the creature's neurons, which in turn control its behavior.
+
+The simulation has several properties that control its behavior such as genomeLength which is the number of genes in a genome, worldSize which is the size of the world in cells, population which is the number of creatures in the simulation, windowSize which is the size of the window displaying the simulation, stepsPerGeneration which is the number of steps in each generation, and quickMode which is a faster mode with minimal console and display output.
+
+The program also includes several classes including the Connection, Neuron, and Brain classes. The Connection class creates connections between neurons, and updates the target neuron's inputValue by adding the product of the source neuron's outputValue multiplied by the weight of the connection. The Neuron class represents a single neuron in a creature's brain and has several functions that determine its behavior such as RandomInput, BlockageUp, XGradient, ConstantPos, Invert, MoveX, MoveY, MoveRandom and MoveToPheromone. The Brain class controls the overall behavior of the creature, and creates and manages the connections between the neurons.
+
+The simulation starts by creating a set of initial genomes for the creatures, then in each generation, the creatures are updated based on their genomes, and their fitness is evaluated. The fitness of a creature is determined by how well it performs in the simulation. The most fit creatures are then selected to breed and create the next generation, while less fit creatures are removed from the simulation. The breeding process involves randomly selecting genes from the most fit creatures to create new genomes, and also introducing mutations to the genes with a small probability.
+
+The simulation continues for several generations, and over time, the creatures' behavior evolves to become better adapted to their environment. The simulation can also be saved and loaded using the 'saveFile' and 'loadFile' properties. The simulation uses the Pygame library for displaying the world and the creatures.
