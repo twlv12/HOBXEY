@@ -3,6 +3,7 @@ import pickle
 import time as t
 import gc
 import pygame
+import numpy as np
 
 
 gc.enable()
@@ -25,7 +26,8 @@ inputNeuronTypes = {
 internalNeuronTypes = {
     "0001" : "ConstantPos",
     "0010" : "ConstantNeg",
-    "0100" : "Invert"
+    "0100" : "Invert",
+    "0101" : "Multiply"
     }
 outputNeuronTypes = {
     "0001" : "MoveX",
@@ -43,14 +45,14 @@ neuronTypeIndicators = {
 
 #--------Properties-----------#
 genomeLength = 6                #How many genes in a genome
-worldSize = (128, 128)          #World size in cells
+worldSize = (64, 64)          #World size in cells
 population = 200                #How many creatures
-windowSize = (1280, 1280)       #Window size
+windowSize = (512, 512)       #Window size
 stepsPerGeneration = 200        #How many steps in each generation
 customGenomes = []              #Will be overwritten by save file
 quickMode = False               #About 3x faster, minimal console and display
 saveFile = 'usersave.pickle'    #File to save to
-loadFile = 'autosave.pickle'    #File to load from
+loadFile = ''    #File to load from
 #--------Properties-----------#
 
 
@@ -83,8 +85,8 @@ def isValid(x,y,world):
     
 
 def remapWeight(x):
-    if x * ( 2 / 15 ) - 1 > 1: return 1
-    else: return x * ( 2 / 15 ) - 1
+    new_value = np.interp(x, [1,15], [-1,1])
+    return new_value
     
     
     
@@ -135,9 +137,13 @@ def saveCreatures(world, file):
     with open(file, "wb") as f:
         pickle.dump(genomes_data, f)
 def loadCreatures():
-    with open(loadFile, "rb") as f:
-        genomes = pickle.load(f)
-    return genomes
+    try:
+        with open(loadFile, "rb") as f:
+            genomes = pickle.load(f)
+        return genomes
+    except Exception:
+        print("No load file found.")
+        return None
         
 
 
@@ -294,24 +300,32 @@ class Neuron:
     def Invert(self, input):
         return -input
 
+    def Multiply(self,input):
+        try:
+            product = self.connectionsIn[0].outputValue
+            for connection in self.connectionsIn[1:]:
+                product *= connection.outputValue
+            return product
+        except Exception: return 0
+
     def MoveX(self, input):
-        if input >= 0.5:
+        if input >= 0.2:
             if self.creature.x + 1 < self.world.sizeX:
                 self.creature.moveToCell(self.world.getCell(self.creature.x + 1, self.creature.y))
-        elif input <= -0.5:
+        elif input <= -0.2:
             if self.creature.x - 1 >= 0:
                 self.creature.moveToCell(self.world.getCell(self.creature.x - 1, self.creature.y))
         
     def MoveY(self, input):
-        if input >= 0.5:
+        if input >= 0.2:
             if self.creature.y + 1 < self.world.sizeY:
                 self.creature.moveToCell(self.world.getCell(self.creature.x, self.creature.y + 1))
-        elif input <= -0.5:
+        elif input <= -0.2:
             if self.creature.y - 1 >= 0:
                 self.creature.moveToCell(self.world.getCell(self.creature.x, self.creature.y - 1))
         
     def MoveRandom(self, input):
-        if input <= -0.5 or input >= 0.5:
+        if input <= -0.2 or input >= 0.2:
             cell = random.choice(self.creature.getAdjacentCells())
             self.creature.moveToCell(cell)
         
@@ -319,7 +333,8 @@ class Neuron:
         return self.creature.phDensity[0]
 
     def MoveToPheromone(self, input):
-        self.creature.moveToCell(self.creature.getPheromoneDensity()[1])
+        if input >= 0.4 or input <= -0.4:
+            self.creature.moveToCell(self.creature.getPheromoneDensity()[1])
 
         
         
@@ -503,7 +518,7 @@ class World:
             self.draw()
         
     def draw(self):
-        self.screen.fill((0, 255, 0))
+        self.screen.fill((0, 0, 0))
         for row in self.cells:
             for cell in row:
                 if cell.creature:
