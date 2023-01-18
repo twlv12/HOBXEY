@@ -28,7 +28,7 @@ The program is structured as follows:
 
 ## Theory
 
-The program uses a genetic algorithm to simulate the evolution of creatures in a virtual world. The creatures are controlled by a neural network, which is defined by a genome, a string of binary digits. The creatures' genomes are randomly generated at the start of the simulation, and are mutated with a certain probability at each step. The creatures' fitness is determined by their ability to move in the virtual world. The creatures with the highest fitness have a higher probability of reproducing and passing on their genome to the next generation. Over time, the creatures' genomes will evolve to optimize their movement in the virtual world, leading to the emergence of intelligent behavior.
+The program uses a genetic algorithm to simulate the evolution of creatures in a virtual world. The creatures are each controlled by a neural network, which is defined by a genome, a binary string. The creatures' genomes are randomly generated at the start of the simulation, and are selected every generation based on user-defined rules. These creatures will reproduce and pass on their genome to the next generation. Over time, the creatures' genomes will evolve to optimize their movement in the virtual world, leading to the emergence of intelligent behavior.
 ## Usage
 
 To run the program, simply execute the file main.py with python. The properties of the simulation can be adjusted in the global variables section at the beginning of the file. Hotkeys are available with the display enabled only. 
@@ -36,6 +36,6 @@ To run the program, simply execute the file main.py with python. The properties 
     R -> Reset sim.
     D -> While hovering over a creature, decode and print brain structure.
     S -> Save to file. If specific file set, use that one.
-##Customization
+## Customization
 
 The program can be easily modified to change the properties of the world, the behavior of the creatures and the parameters of the genetic algorithm. You can also change the behavior of the creature by changing the types of neurons and the logic of their function. To add a new neuron type, add it with its name to the corresponding type dictionary. Create a function inside the Neuron class to define the neuron's behaviour. Make sure the function name is exactly as it is in the dictionary.
