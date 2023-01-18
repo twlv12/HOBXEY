@@ -8,7 +8,7 @@
   <h3>Hybrid Organism Behavior eXperimentation sYstem</h3>
 </div>
 
-This program uses genetic algorithms to simulate the evolution of organisms in a virtual world. Creatures are controlled by a neural network defined by a genome, a string of binary digits. This program uses the pygame library to visualize the world.
+This program uses genetic algorithms to simulate the evolution of organisms in a virtual world, controlled by a neural network.
 ## Requirements
 
     Python 3
