@@ -12,6 +12,7 @@
     <OutputPath>.</OutputPath>
     <Name>Neural Genetic Simulation</Name>
     <RootNamespace>EvolutionV2</RootNamespace>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

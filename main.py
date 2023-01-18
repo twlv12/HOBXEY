@@ -21,13 +21,13 @@ inputNeuronTypes = {
     "1000" : "Density",
     "1001" : "Pheromone",
     "1010" : "BlockageLeft",
-    "1011" : "BlockageRight"
+    "1011" : "BlockageRight",
+    "1100" : "ConstantPos",
+    "1101" : "ConstantNeg",
     }
 internalNeuronTypes = {
-    "0001" : "ConstantPos",
-    "0010" : "ConstantNeg",
-    "0100" : "Invert",
-    "0101" : "Multiply"
+    "0001" : "Invert",
+    "0010" : "Multiply"
     }
 outputNeuronTypes = {
     "0001" : "MoveX",
@@ -231,16 +231,17 @@ class Neuron:
         self.type = type
         self.creature = brain.creature
         self.world = self.creature.world
-        self.connections = []
+        self.connectionsOut = []
         self.connectionsIn = []
         
     def connect(self, target, weight):
-        self.connections.append(Connection(self, target, weight))
+        self.connectionsOut.append(Connection(self, target, weight))
+        target.connectionsIn.append(Connection(target, self, weight))
         
     def update(self):
         self.outputValue = getattr(self, self.type)(self.inputValue)
         self.inputValue = 0
-        for connection in self.connections:
+        for connection in self.connectionsOut:
             connection.update()
             
     def RandomInput(self, input):
@@ -370,7 +371,6 @@ class Brain:
                 targetNeuron = [neuron for neuron in self.neurons if neuron.type == targetType][0]
                 
             sourceNeuron.connect(targetNeuron, weight)
-            targetNeuron.connectionsIn.append(sourceNeuron)
             i += 1
         
     def update(self):
@@ -604,7 +604,7 @@ def main():
                             print("Please wait before saving.")
 
         if not quickMode:
-            if showDisplay: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Cell ({str(cell.x).zfill(3)},{str(cell.y).zfill(3)}) | Ph {str(round(cell.pheromone, 3)).zfill(4)} | {population}")
+            if showDisplay: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Cell ({str(cell.x).zfill(3)},{str(cell.y).zfill(3)}) | Ph {str(round(cell.pheromone, 3)).zfill(4)} | Pop {population}")
             else: print(f"Step {str(counter).zfill(3)} | Gen {gen} | Win {str(iq).zfill(3)} | Moves {str(world.movements).zfill(3)} | Pop {population}")
         counter += 1
         gc.collect()
