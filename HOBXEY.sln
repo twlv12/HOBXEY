@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Neural Genetic Simulation", "Neural Genetic Simulation.pyproj", "{C168A5BB-00CD-4DAD-8AD4-9C2B91ECADBA}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "HOBXEY", "HOBXEY.pyproj", "{C168A5BB-00CD-4DAD-8AD4-9C2B91ECADBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
