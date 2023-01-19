@@ -7,7 +7,7 @@ import numpy as np
 
 
 gc.enable()
-
+#this is a comment
 
 
 inputNeuronTypes = {
