@@ -45,40 +45,36 @@ neuronTypeIndicators = {
 
 #--------Properties-----------#
 genomeLength = 6                #How many genes in a genome
-worldSize = (64, 64)          #World size in cells
-population = 200                #How many creatures
-windowSize = (512, 512)       #Window size
+worldSize = (128, 128)          #World size in cells
+population = 1000                #How many creatures
+windowSize = (1280, 1280)       #Window size
 stepsPerGeneration = 200        #How many steps in each generation
 mutationChance = 5           #Chance in percent for a mutation to occur on each creature
 customGenomes = []              #Will be overwritten by save file
 quickMode = False               #About 3x faster, minimal console and display
 saveFile = ''    #File to save to
-loadFile = ''    #File to load from
+loadFile = 'autosave.pickle'    #File to load from
 #--------Properties-----------#
 
 
 
 #--------Basic Functions-----------#
 
-""" Within 10x10 square at the center of the world:
-
+""" Within 20x20 square at the center of the world:
 if(x > (world.sizeX//2 - 10)) and (x < (world.sizeX//2 + 10)) and (y > (world.sizeY//2 - 10)) and (y < (world.sizeY//2 + 10)):
     return 1
 else: return 0
-
 """
    
 """ Within 5 cells of the boundaries:
-
 if 4 <= x <= world.sizeX-4 and 4 <= y <= world.sizeY-4:
     return 0
 else: return 1
-
 """
         
 
 def isValid(x,y,world):
-    if(x > (world.sizeX//2 - 10)) and (x < (world.sizeX//2 + 10)) and (y > (world.sizeY//2 - 10)) and (y < (world.sizeY//2 + 10)):
+    if(x > (world.sizeX//2 - 20)) and (x < (world.sizeX//2 + 20)) and (y > (world.sizeY//2 - 20)) and (y < (world.sizeY//2 + 20)):
         return 1
     else: return 0
 
@@ -292,7 +288,7 @@ class Neuron:
         except: return 1
 
     def Density(self, input):
-        return self.creature.density
+        return self.creature.getPopDensity()
        
     def ConstantPos(self, input):
         return 1
@@ -333,7 +329,7 @@ class Neuron:
             self.creature.moveToCell(cell)
         
     def Pheromone(self, input):
-        return self.creature.phDensity[0]
+        return self.creature.getPheromoneDensity()[0]
 
     def MoveToPheromone(self, input):
         if input >= 0.4 or input <= -0.4:
@@ -412,8 +408,6 @@ class Creature:
         world.freeCells.remove(self.cell)
         
     def update(self):
-        self.density = self.getPopDensity()
-        self.phDensity = self.getPheromoneDensity()
         self.brain.update()
         self.cell.pheromone += 0.01
         self.canReproduce = isValid(self.x,self.y,self.world)
